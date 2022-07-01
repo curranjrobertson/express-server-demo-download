@@ -1,0 +1,7 @@
+node_modules
+
+# Firebase config file
+fb-config.json
+
+# env file
+.env

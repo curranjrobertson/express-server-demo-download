@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+      "christian-kohler.npm-intellisense",
+      "christian-kohler.path-intellisense",
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "jasonnutter.search-node-modules",
+      "streetsidesoftware.code-spell-checker"
+    ]
+  }
