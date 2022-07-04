@@ -72,23 +72,27 @@ export async function deleteUserData(userId) {
  * @param {string} userId The Ory user id used as the document id of the user document in the database.
  * @param {string} sessionId The session to remember.
  * @param {string} deviceName The device name to associated with the session.
+ *
  * @returns {Promise<boolean>} Returns true if the user document was updated successfully.
  * @returns {Promise<boolean>} Returns nothing if the user document was created successfully.
  */
-export async function rememberDevice(userId, sessionId) {
+export async function rememberDevice(userId, sessionId, cookie) {
     // get the user document from the database
     const userDoc = await admin.firestore().collection('users').doc(userId).get();
     //print the user document
     console.log('userDoc:', userDoc);
     // read data from the database user document
     const userDocData = userDoc.data();
+    const meta_data = 'meta data';
     if (userDocData !== undefined) {
         // update the user document
         await admin
             .firestore()
             .collection('users')
             .doc(userId)
-            .update({ SessionID: FieldValue.arrayUnion(sessionId) });
+            .update({
+            Device_Name2: FieldValue.arrayUnion(sessionId, cookie, meta_data)
+        });
         return true;
     }
     else {
@@ -97,7 +101,7 @@ export async function rememberDevice(userId, sessionId) {
             .firestore()
             .collection('users')
             .doc(userId)
-            .set({ SessionID: [sessionId] });
+            .set({ Device_Name2: [sessionId] });
     }
 }
 /**
@@ -139,6 +143,26 @@ export async function revoke_session(user_id, session_id, cookie) {
             .doc(user_id)
             .update({ Device_Name: FieldValue.arrayRemove(session_id) });
         return true;
+    }
+    else {
+        // return error if the user document does not exist
+        throw new Error('User does not exist');
+    }
+}
+/**
+ * List Devices
+ * @param {string} user_id The Ory user id.
+ * @returns {Promise<string[]>} Returns a list of devices.
+ */
+export async function list_devices(user_id) {
+    // get the user document from the database
+    const userDoc = await admin
+        .firestore()
+        .collection('users')
+        .doc(user_id)
+        .get();
+    if (userDoc.data() !== undefined) {
+        return userDoc.data();
     }
     else {
         // return error if the user document does not exist

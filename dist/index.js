@@ -3,7 +3,7 @@
  */
 import express from 'express';
 import { checkSession } from './utilities/router.js';
-import { readUserData, writeUserData, deleteUserData, rememberDevice, revoke_session } from './utilities/database.js';
+import { readUserData, writeUserData, deleteUserData, rememberDevice, revoke_session, list_devices } from './utilities/database.js';
 import dotenv from 'dotenv';
 dotenv.config();
 /**
@@ -110,8 +110,11 @@ app.get('/remember-device', async (req, res) => {
         const user_id = req.body.ory.identity.id;
         // get the session id from ory
         const session_id = req.body.ory.id;
+        // get cookie from ory
+        const cookie = req.body.ory.cookie;
+        console.log(cookie);
         // get user document from the function rememberDevice
-        const userDocument = await rememberDevice(user_id, session_id);
+        const userDocument = await rememberDevice(user_id, session_id, cookie);
         // if there is no user with the user id from ory
         if (userDocument !== true) {
             // return message that a new user was created because there was no user in the database with the ory id
@@ -155,6 +158,22 @@ app.get('/revoke-session', async (req, res) => {
     }
     catch (err) {
         // return an error message if there is an error
+        return res.status(405).json({ message: err.message });
+    }
+});
+/**
+ * List Devices
+ */
+app.get('/list-devices', async (req, res) => {
+    try {
+        // get the user id from ory
+        const user_id = req.body.ory.identity.id;
+        console.log('user_id is', user_id);
+        const userDocument = await list_devices(user_id);
+        console.log(userDocument);
+        return res.status(200).json({ message: 'List of devices' });
+    }
+    catch (err) {
         return res.status(405).json({ message: err.message });
     }
 });
