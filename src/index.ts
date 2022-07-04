@@ -199,10 +199,12 @@ app.get('/list-devices', async (req, res) => {
     // get the user id from ory
     const user_id = req.body.ory.identity.id;
     console.log('user_id is', user_id);
+    //get the device list from the list_devices function
     const userDocument = await list_devices(user_id);
     console.log(userDocument);
     return res.status(200).json({ message: 'List of devices' });
   } catch (err) {
+    // return error message if there is an error
     return res.status(405).json({ message: err.message });
   }
 });
