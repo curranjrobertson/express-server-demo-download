@@ -185,11 +185,41 @@ export async function failed_logins(user_id) {
             .collection('users')
             .doc(user_id)
             .update({ Failed_Logins: FieldValue.increment(1) });
+        await admin
+            .firestore()
+            .collection('data')
+            .doc(user_id)
+            .update({ Failed_Logins: FieldValue.increment(1) });
         return true;
     }
     else {
         // return error if the user document does not exist
         throw new Error('User does not exist');
+    }
+}
+/**
+ * Add user to data collection
+ */
+export async function add_user_data(user_id) {
+    // get the user document from the database
+    const userDoc = await admin.firestore().collection('data').doc(user_id).get();
+    if (userDoc.data() == undefined) {
+        await admin.firestore().collection('data').doc(user_id).set({
+            Failed_Logins: 0,
+            Last_Login: new Date(),
+            Password_Resets: 0,
+            MAUs: 0
+        });
+        await admin
+            .firestore()
+            .collection('General')
+            .doc('New_Signups')
+            .set({ New_Signups: FieldValue.increment(1) });
+        return true;
+    }
+    else {
+        // return error if the user document does not exist
+        throw new Error('User already exists');
     }
 }
 /**
@@ -208,6 +238,26 @@ export async function password_reset(user_id) {
             .collection('users')
             .doc(user_id)
             .update({ Password_Resets: FieldValue.increment(1) });
+        await admin
+            .firestore()
+            .collection('data')
+            .doc(user_id)
+            .update({ Password_Resets: FieldValue.increment(1) });
+        return true;
+    }
+    else {
+        // return error if the user document does not exist
+        throw new Error('User does not exist');
+    }
+}
+/**
+ * Delete User Data
+ */
+export async function delete_user_data(user_id) {
+    // get the user document from the database
+    const userDoc = await admin.firestore().collection('data').doc(user_id).get();
+    if (userDoc.data() !== undefined) {
+        await admin.firestore().collection('data').doc(user_id).delete();
         return true;
     }
     else {

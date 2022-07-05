@@ -11,7 +11,9 @@ import {
   revoke_session,
   list_devices,
   failed_logins,
-  password_reset
+  password_reset,
+  add_user_data,
+  delete_user_data
 } from './utilities/database.js';
 import dotenv from 'dotenv';
 
@@ -250,6 +252,44 @@ app.get('/password-reset', async (req, res) => {
       return res
         .status(405)
         .json({ message: 'Password Reset not added to database' });
+    }
+  } catch (err) {
+    // return error message if there is an error
+    return res.status(405).json({ message: err.message });
+  }
+});
+
+/**
+ * Add user data
+ */
+app.get('/add-user-data', async (req, res) => {
+  try {
+    const user_id = req.body.ory.identity.id;
+    const userDocument = await add_user_data(user_id);
+    if (userDocument) {
+      return res.status(200).json({ message: 'User data added successfully' });
+    } else {
+      return res.status(405).json({ message: 'User data not added' });
+    }
+  } catch (err) {
+    // return error message if there is an error
+    return res.status(405).json({ message: err.message });
+  }
+});
+
+/**
+ * Delete User Data
+ */
+app.get('/delete-user-data', async (req, res) => {
+  try {
+    const user_id = req.body.ory.identity.id;
+    const userDocument = await delete_user_data(user_id);
+    if (userDocument) {
+      return res
+        .status(200)
+        .json({ message: 'User data deleted successfully' });
+    } else {
+      return res.status(405).json({ message: 'User data not deleted' });
     }
   } catch (err) {
     // return error message if there is an error
