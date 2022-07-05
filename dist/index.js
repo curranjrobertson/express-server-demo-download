@@ -3,7 +3,7 @@
  */
 import express from 'express';
 import { checkSession } from './utilities/router.js';
-import { readUserData, writeUserData, deleteUserData, rememberDevice, revoke_session, list_devices, failed_logins } from './utilities/database.js';
+import { readUserData, writeUserData, deleteUserData, rememberDevice, revoke_session, list_devices, failed_logins, password_reset } from './utilities/database.js';
 import dotenv from 'dotenv';
 dotenv.config();
 /**
@@ -196,6 +196,30 @@ app.get('/failed-login', async (req, res) => {
             return res
                 .status(405)
                 .json({ message: 'Failed login not added to database' });
+        }
+    }
+    catch (err) {
+        // return error message if there is an error
+        return res.status(405).json({ message: err.message });
+    }
+});
+/**
+ * Password reset
+ */
+app.get('/password-reset', async (req, res) => {
+    try {
+        //
+        const user_id = req.body.ory.identity.id;
+        const login = await password_reset(user_id);
+        if (login) {
+            return res
+                .status(200)
+                .json({ message: 'Password Reset added to database successfully' });
+        }
+        else {
+            return res
+                .status(405)
+                .json({ message: 'Password Reset not added to database' });
         }
     }
     catch (err) {

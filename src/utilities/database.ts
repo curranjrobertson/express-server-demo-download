@@ -223,3 +223,26 @@ export async function failed_logins(user_id: string) {
     throw new Error('User does not exist');
   }
 }
+
+/**
+ * Password Resets
+ */
+export async function password_reset(user_id: string) {
+  // get the user document from the database
+  const userDoc = await admin
+    .firestore()
+    .collection('users')
+    .doc(user_id)
+    .get();
+  if (userDoc.data() !== undefined) {
+    await admin
+      .firestore()
+      .collection('users')
+      .doc(user_id)
+      .update({ Password_Resets: FieldValue.increment(1) });
+    return true;
+  } else {
+    // return error if the user document does not exist
+    throw new Error('User does not exist');
+  }
+}
