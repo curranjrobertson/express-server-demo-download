@@ -169,3 +169,26 @@ export async function list_devices(user_id) {
         throw new Error('User does not exist');
     }
 }
+/**
+ * Failed Logins
+ */
+export async function failed_logins(user_id) {
+    // get the user document from the database
+    const userDoc = await admin
+        .firestore()
+        .collection('users')
+        .doc(user_id)
+        .get();
+    if (userDoc.data() !== undefined) {
+        await admin
+            .firestore()
+            .collection('users')
+            .doc(user_id)
+            .update({ Failed_Logins: FieldValue.increment(1) });
+        return true;
+    }
+    else {
+        // return error if the user document does not exist
+        throw new Error('User does not exist');
+    }
+}

@@ -9,7 +9,8 @@ import {
   deleteUserData,
   rememberDevice,
   revoke_session,
-  list_devices
+  list_devices,
+  failed_logins
 } from './utilities/database.js';
 import dotenv from 'dotenv';
 
@@ -203,6 +204,29 @@ app.get('/list-devices', async (req, res) => {
     const userDocument = await list_devices(user_id);
     console.log(userDocument);
     return res.status(200).json({ message: 'List of devices' });
+  } catch (err) {
+    // return error message if there is an error
+    return res.status(405).json({ message: err.message });
+  }
+});
+
+/**
+ * Failed Logins
+ */
+app.get('failed-login', async (req, res) => {
+  try {
+    //
+    const user_id = req.body.ory.identity.id;
+    const login = await failed_logins(user_id);
+    if (login) {
+      return res
+        .status(200)
+        .json({ message: 'Failed login added to database successfully' });
+    } else {
+      return res
+        .status(405)
+        .json({ message: 'Failed login not added to database' });
+    }
   } catch (err) {
     // return error message if there is an error
     return res.status(405).json({ message: err.message });
