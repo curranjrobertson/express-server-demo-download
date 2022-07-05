@@ -204,7 +204,7 @@ app.get('/failed-login', async (req, res) => {
     }
 });
 /**
- * Password reset
+ * Password Resets
  */
 app.get('/password-reset', async (req, res) => {
     try {
