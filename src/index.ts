@@ -213,7 +213,7 @@ app.get('/list-devices', async (req, res) => {
 /**
  * Failed Logins
  */
-app.get('failed-login', async (req, res) => {
+app.get('/failed-login', async (req, res) => {
   try {
     //
     const user_id = req.body.ory.identity.id;
